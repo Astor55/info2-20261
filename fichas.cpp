@@ -6,7 +6,7 @@ using namespace std;
 
 /*
 
-Crea la pieza T usando operaciones bitwise.
+Crean las piezas del tetris.
 
 Se utiliza SHIFT (<<) para posicionar un bit en la celda correspondiente
 dentro de una matriz lógica de 4x4 representada en 16 bits.
@@ -22,7 +22,7 @@ Representación de la pieza:
         0 0 0 0
 
 */
-unsigned short CrearPiezaT()
+unsigned short CrearPiezaT() // se crea la pieza T del tetris 3x2
 {
     unsigned short pieza = 0;
 
@@ -35,7 +35,7 @@ unsigned short CrearPiezaT()
 }
 
 
-unsigned short CrearPiezaL()
+unsigned short CrearPiezaL() //se crea la pieza L del tetris 2x3
 {
 
     unsigned short pieza = 0;
@@ -50,7 +50,7 @@ unsigned short CrearPiezaL()
 }
 
 
-unsigned short CrearPiezaJ()
+unsigned short CrearPiezaJ() // se crea la pieza J del tetris 2x3
 {
 
     unsigned short pieza = 0;
@@ -65,7 +65,7 @@ unsigned short CrearPiezaJ()
 }
 
 
-unsigned short CrearPiezaZ()
+unsigned short CrearPiezaZ() // se crea la pieza Z del tetris 3x2
 {
 
     unsigned short pieza = 0;
@@ -80,7 +80,7 @@ unsigned short CrearPiezaZ()
 }
 
 
-unsigned short CrearPiezaO()
+unsigned short CrearPiezaO() // se crea la pieza O del tetris 2x2
 {
 
     unsigned short pieza = 0;
@@ -95,6 +95,10 @@ unsigned short CrearPiezaO()
 }
 
 
+/*
+ElegirPieza crea una serie de casos que al ejecutarse algun numero entre 0 y 4
+que se reciba, entonces se elije que pieza se generará.
+*/
 unsigned short ElegirPieza(int cual)
 {
 
@@ -121,7 +125,7 @@ unsigned short ElegirPieza(int cual)
 Imprime en consola la representación visual de una pieza.
 Los bits activos se muestran como '#' y los inactivos como '.'.
 
-representacion visual
+representacion visual.
 
         . # . .
         # # # .
@@ -153,10 +157,42 @@ void ImprimirPieza(unsigned short pieza)
 }
 
 
+/*
+RotarPieza es una funcion que sirve para rotar la pieza que está en el tablero
+una vez el usuario usa el comando para rotar, se actuvará la funcion y esta se
+reorgamizará 90° en sentido horario.
+*/
 unsigned short RotarPieza(unsigned short pieza)
 {
 
+    unsigned short NuevaPos = 0;
 
+    for (int fila = 0; fila < 4; fila++)
+    {
+
+        for (int columna = 0; columna < 4; columna++)
+        {
+
+            int bit = (fila * 4) + columna;
+
+            if (pieza &(1 << bit))
+            {
+
+                int NuevaFila = columna;
+
+                int NuevaColumna = 3 - fila;
+
+                int nuevoBit = (NuevaFila * 4) + NuevaColumna;
+
+                NuevaPos |= (1 << nuevoBit);
+
+            }
+
+        }
+
+    }
+
+    return NuevaPos;
 
 }
 

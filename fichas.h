@@ -2,19 +2,19 @@
 #define FICHAS_H
 
 
-unsigned short PiezasT();
+unsigned short CrearPiezaT();
 
 
-unsigned short PiezasL();
+unsigned short CrearPiezaL();
 
 
-unsigned short PiezasJ();
+unsigned short CrearPiezaJ();
 
 
-unsigned short PiezasZ();
+unsigned short CrearPiezaZ();
 
 
-unsigned short PiezasO();
+unsigned short CrearPiezaO();
 
 
 unsigned short PiezaElegir(int cual);
@@ -23,7 +23,7 @@ unsigned short PiezaElegir(int cual);
 bool celda_activa(unsigned short pieza, int fila, int columna);
 
 
-void ImprimirPiezas(unsigned short pieza);
+void ImprimirPieza(unsigned short pieza);
 
 
 unsigned short RotarPieza(unsigned short pieza);

@@ -15,6 +15,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 add_executable(desafio1-20261
   fichas.cpp
   fichas.h
+  main.cpp
 )
 target_link_libraries(desafio1-20261 PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 

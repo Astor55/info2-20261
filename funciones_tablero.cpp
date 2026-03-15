@@ -2,16 +2,18 @@
 #include <iostream>
 using namespace std;
 
-/*
-Esta funcion recibe una altura X y una anchura Y, las cuales son las dimensiones de una matriz
-la cual cada uno de sus elementos seran apuntadores a char, la funcion unicamente la crea para poder
-ser utilizada durante la ejecucion del programa, por lo mismo es que no se libera el espacio en memoria
-reservado
+
+
+char **tablero(int alto, int  ancho){
+
+
+    /*
+    Esta funcion recibe una altura X y una anchura Y, las cuales son las dimensiones de una matriz
+    la cual cada uno de sus elementos seran apuntadores a char, la funcion unicamente la crea para poder
+    ser utilizada durante la ejecucion del programa, por lo mismo es que no se libera el espacio en memoria
+    reservado
 
  */
-
-char **tablero(int alto, int  ancho){ // Funcion la cual crea el tablero del tetris, retorna un apuntador de apuntadores para poder trabajar sobre el tablero
-
     char **tab = new char *[alto]; // creamos el apunt de apunt y a su valor le guardamos espacio en el Heap, siendo guardada un arreglo estatico a char con dimension "Alto"
 
     for (int a = 0; a < alto ; a++){
@@ -61,7 +63,7 @@ void imprimir_tablero(char **table, int alto, int ancho){
 }
 
 
-void borrar_pieza_del_tablero(char **tab, char pieza[4][4], int x, int y){ // x es la columna en la que se encuentra la figura, y Y la fila
+void borrar_pieza_del_tablero(char **tab, unsigned char pieza[4], int x, int y){ // x es la columna en la que se encuentra la figura, y Y la fila
 
     /*
 
@@ -73,7 +75,7 @@ void borrar_pieza_del_tablero(char **tab, char pieza[4][4], int x, int y){ // x 
 
         for(int columna = 0; columna < 4; columna++){
 
-            if (pieza[fila][columna] == '#'){
+            if (pieza[fila] & (1 <<(3 << columna))){
 
                 tab[y + fila][x + columna] = '.';
             }
@@ -83,7 +85,7 @@ void borrar_pieza_del_tablero(char **tab, char pieza[4][4], int x, int y){ // x 
     }
 }
 
-void dibujar_pieza_del_tablero(char **tab, char pieza[4][4], int x, int y){ // x es la columna de la nueva posocion en la que se encuentra la figura, y Y la fila
+void dibujar_pieza_del_tablero(char **tab, unsigned char pieza[4], int x, int y){ // x es la columna de la nueva posocion en la que se encuentra la figura, y Y la fila
 
 
     /*
@@ -95,9 +97,9 @@ void dibujar_pieza_del_tablero(char **tab, char pieza[4][4], int x, int y){ // x
 
         for(int columna = 0; columna < 4; columna++){
 
-            if(tab[fila][columna] == '#'){
+            if(pieza[fila] & (1 << (3 - columna))){
 
-                tab[fila + y][columna + x] = '#';
+                tab[y + fila][x + columna] = '#';
             }
         }
     }
@@ -105,7 +107,7 @@ void dibujar_pieza_del_tablero(char **tab, char pieza[4][4], int x, int y){ // x
 
 
 
-char **actualizacion_tablero(char pieza[4][4], char **tabl, int alto, int ancho){
+void actualizacion_tablero(unsigned char pieza[4], char **tabl, int alto, int ancho, int x, int y){
 
     /*
 
@@ -122,7 +124,7 @@ char **actualizacion_tablero(char pieza[4][4], char **tabl, int alto, int ancho)
 
                 for(int j = 0; j <4; j++){
 
-                    if (pieza[i][j == '#' && fila == y+i && columna == x+j]){
+                    if ((pieza[i] & (1 << (3-j))) && fila == y+i && columna == x+j){
 
                         cout << '#';
                         dibujado = true;
@@ -142,5 +144,53 @@ char **actualizacion_tablero(char pieza[4][4], char **tabl, int alto, int ancho)
 
         }
         cout << endl;
+    }
+}
+
+
+void eliminacion_fila(char **tab, int alto, int ancho){
+
+    /*
+
+    Esta funcion se encarga de verificar si una fila se encuentra llena por completo, por tanto se elimina.
+    Basicamente lo que hace es identificar la fila llena, despues se reemplazan los elementos que tenia esa
+    fila con los elementos que tiene la fila anterior, y asi con todas las filas para dar esa simulacion de
+    caida, al final se suma una a las filas para confirmar si en esa misma posicion hubo otra fila llena, caso
+    que puede pasar si se llenan dos filas o hasta mas al mismo instante.
+
+     */
+
+    for(int filas = alto -1; filas >= 0; filas--){
+
+        bool filallena = true;
+
+        for(int columnas = 0; columnas < ancho; columnas++){
+
+            if(tab[i][j] == '.'){
+
+                filallena = false;
+                break;
+            }
+
+
+        }
+
+        if (filallena == true){
+
+            for(int i = filas; i > 0; i--){
+
+                for(int j = 0; j < ancho; j++){
+
+                    tab[i][j] = tab[i - 1][j];
+                }
+            }
+
+            for(int k = 0; k < ancho; k++){
+
+                tab[0][k] = '.';
+            }
+
+            filas++;
+        }
     }
 }

@@ -20,7 +20,7 @@ unsigned short CrearPiezaO();
 unsigned short PiezaElegir(int cual);
 
 
-bool celda_activa(unsigned short pieza, int fila, int columna);
+bool celda_activa(unsigned short pieza, int x, int y);
 
 
 void ImprimirPieza(unsigned short pieza);

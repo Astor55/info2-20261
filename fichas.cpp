@@ -14,7 +14,7 @@ dentro de una matriz lógica de 4x4 representada en 16 bits.
 Luego se usa OR (|) para activar esos bits dentro de la variable que
 representa la pieza.
 
-Representación de la pieza:
+Representación de la pieza(T):
 
         0 1 0 0
         1 1 1 0
@@ -97,7 +97,7 @@ unsigned short CrearPiezaO() // se crea la pieza O del tetris 2x2
 
 /*
 ElegirPieza crea una serie de casos que al ejecutarse algun numero entre 0 y 4
-que se reciba, entonces se elije que pieza se generará.
+que se reciba, entonces se elije que pieza se generará esto ayuda a la aleatoriedad.
 */
 unsigned short ElegirPieza(int cual)
 {
@@ -125,7 +125,7 @@ unsigned short ElegirPieza(int cual)
 Imprime en consola la representación visual de una pieza.
 Los bits activos se muestran como '#' y los inactivos como '.'.
 
-representacion visual.
+representacion visual(T).
 
         . # . .
         # # # .
@@ -158,9 +158,11 @@ void ImprimirPieza(unsigned short pieza)
 
 
 /*
-RotarPieza es una funcion que sirve para rotar la pieza que está en el tablero
-una vez el usuario usa el comando para rotar, se actuvará la funcion y esta se
+RotarPieza es una funcion que sirve para girar la pieza que está en el tablero
+una vez el usuario usa el comando para rotar, se activará la funcion y esta se
 reorgamizará 90° en sentido horario.
+
+La rotacion se realiza manipulando los bits de la matriz 4x4
 */
 unsigned short RotarPieza(unsigned short pieza)
 {
@@ -197,17 +199,100 @@ unsigned short RotarPieza(unsigned short pieza)
 }
 
 
+/*
+celda_activa lo que hace es verificar si una celda está
+activa dentro de la pieza, esto ayudapara ver si una celda
+está activa para cuando se confirmen las colisiones.
+*/
+bool celda_activa(unsigned short pieza, int x, int y)
+{
+
+    int bit = (x * 4) + y;
+
+    unsigned short mascara = 1 << bit;
+
+    if (pieza & mascara)
+    {
+
+        return true;
+
+    }
+
+    else
+    {
+
+        return false;
+
+    }
+}
 
 
 
+/*
+Colision verifica si la pieza colisionará con el tablero
+en una pusicion dada.
+
+retornará el boolean correspondiente.
+TRUE... si hay colision
+FALSE... si no la hay
+*/
+bool Colision(char** tablero, unsigned short pieza, int x, int y)
+{
+
+    for (int fila = 0; fila < 4; fila++)
+    {
+
+        for(int columna = 0; columna < 4; columna++)
+        {
+
+            if(celda_activa(pieza, fila, columna))
+            {
+
+                if(tablero[y + fila][x + columna] != '.')
+                {
+
+                    return true;
+
+                }
+
+            }
+
+        }
+
+    }
+
+    return false;
+
+}
 
 
+/*
+Fijar_pieza se encarga de recorrer la matriz 4x4 de la pieza
+y verificar las colisones para saber si puede fijar la pieza
+fijar la pieza significa hacer una copia de la pieza en esa posicion
+donde se detectó la colision.
+*/
+void Fijar_pieza(char** tablero, unsigned short pieza, int x, int y)
+{
 
+    for(int fila = 0; fila < 4; fila++)
+    {
 
+        for(int columna = 0; columna < 4; columna++)
+        {
 
+            if(celda_activa(pieza, fila, columna))
+            {
 
+                tablero[y + fila][x + columna] = '#';
 
+            }
 
+        }
+
+    }
+
+}
 
 
 

@@ -194,3 +194,26 @@ void eliminacion_fila(char **tab, int alto, int ancho){
         }
     }
 }
+
+bool game_over(char **tab, int ancho){
+
+    /*
+
+    Esta funcion se encarga de detectar cuando hay un posible "Game Over"
+    verificando si en algun elemento de la primera fila, hay una posicion
+    ocupada.
+
+     */
+
+    for(int columna = 0; columna < ancho; columna++){
+
+        if(tab[0][columna] == '#'){
+
+            return true; // Si detecata un espacio ocupada en la primera fila, se confirma game over, debido a que no se pueden acumular mas piezas
+        }
+
+      }
+
+
+    return false; // Si no detecta un espacio ocupado en la primera fila, el juego sigue hasta que se verifique otra vez la condicion
+}

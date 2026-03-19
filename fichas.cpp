@@ -96,8 +96,8 @@ unsigned short CrearPiezaO() // se crea la pieza O del tetris 2x2
 
 
 /*
-ElegirPieza crea una serie de casos que al ejecutarse algun numero entre 0 y 4
-que se reciba, entonces se elije que pieza se generará esto ayuda a la aleatoriedad.
+ElegirPieza selecciona una pieza según un numero recibido.
+    e   sto sirve como una base para generar las piezas aleatoriamente.
 */
 unsigned short ElegirPieza(int cual)
 {
@@ -114,6 +114,8 @@ unsigned short ElegirPieza(int cual)
     case 3: return CrearPiezaZ();
 
     case 4: return CrearPiezaO();
+
+    default: return CrearPiezaT();
 
     }
 
@@ -141,16 +143,16 @@ void ImprimirPieza(unsigned short pieza)
 
         if(pieza & (1 << i))
 
-            cout << "#";
+        cout << "#";
 
         else
 
-            cout << ".";
+        cout << ".";
 
 
         if(i % 4 == 0)
 
-            cout << endl;
+        cout << endl;
 
     }
 
@@ -233,10 +235,10 @@ Colision verifica si la pieza colisionará con el tablero
 en una pusicion dada.
 
 retornará el boolean correspondiente.
-TRUE... si hay colision
-FALSE... si no la hay
+TRUE -> si hay colision
+FALSE -> si no la hay
 */
-bool Colision(char** tablero, unsigned short pieza, int x, int y)
+bool Colision(char** tablero, unsigned short pieza, int x, int y, int alto, int ancho)
 {
 
     for (int fila = 0; fila < 4; fila++)
@@ -248,13 +250,23 @@ bool Colision(char** tablero, unsigned short pieza, int x, int y)
             if(celda_activa(pieza, fila, columna))
             {
 
-                if(tablero[y + fila][x + columna] != '.')
+                int tableroY = y + fila;
+
+                int tableroX = x + columna;
+
+                if(tableroY < 0 || tableroY >= alto
+                    || tableroX <= 0 || tableroX >= ancho - 1) // limites del tablero
                 {
 
                     return true;
 
                 }
+                if(tablero[tableroY][tableroX] != '.') // colisiona con lo que no sea vacio '.'
+                {
 
+                    return true;
+
+                }
             }
 
         }
@@ -267,10 +279,8 @@ bool Colision(char** tablero, unsigned short pieza, int x, int y)
 
 
 /*
-Fijar_pieza se encarga de recorrer la matriz 4x4 de la pieza
-y verificar las colisones para saber si puede fijar la pieza
-fijar la pieza significa hacer una copia de la pieza en esa posicion
-donde se detectó la colision.
+Fijar_pieza se encarga de hace una copia de la pieza en el tablero una vez
+se deja en la posicion deseada.
 */
 void Fijar_pieza(char** tablero, unsigned short pieza, int x, int y)
 {

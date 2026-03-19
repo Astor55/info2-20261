@@ -17,6 +17,11 @@ add_executable(desafio1
   funciones_tablero.h
   funciones_tablero.cpp
 )
+
+
+set_target_properties(desafio1 PROPERTIES WIN32_EXECUTABLE OFF)
+
+
 target_link_libraries(desafio1 PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 
 include(GNUInstallDirs)

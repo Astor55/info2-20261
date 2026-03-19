@@ -166,7 +166,7 @@ void eliminacion_fila(char **tab, int alto, int ancho){
 
         for(int columnas = 0; columnas < ancho; columnas++){
 
-            if(tab[i][j] == '.'){
+            if(tab[filas][columnas] == '.'){
 
                 filallena = false;
                 break;

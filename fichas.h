@@ -7,6 +7,7 @@ unsigned short CrearPiezaL();
 unsigned short CrearPiezaJ();
 unsigned short CrearPiezaZ();
 unsigned short CrearPiezaO();
+unsigned short  CrearPiezaRecta();
 
 // seleccion de la pieza
 unsigned short ElegirPieza(int cual);

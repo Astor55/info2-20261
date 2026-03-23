@@ -60,10 +60,12 @@ void imprimir_tablero(char **table, int alto, int ancho){
 
         cout << endl;
     }
+
+
 }
 
 
-void borrar_pieza_del_tablero(char **tab, unsigned char pieza[4], int x, int y){ // x es la columna en la que se encuentra la figura, y Y la fila
+void borrar_pieza_del_tablero(char **tab, unsigned short pieza, int x, int y){ // x es la columna en la que se encuentra la figura, y Y la fila
 
     /*
 
@@ -75,77 +77,98 @@ void borrar_pieza_del_tablero(char **tab, unsigned char pieza[4], int x, int y){
 
         for(int columna = 0; columna < 4; columna++){
 
-            if (pieza[fila] & (1 <<(3 << columna))){
+            int bit = 15 - (fila * 4 + columna);
 
-                tab[y + fila][x + columna] = '.';
+            if ((pieza >> bit) & 1){
+
+                int tableroY = y + fila;
+                int tableroX = x + columna;
+
+                if (tableroY >= 0)
+                {
+                    tab[tableroY][tableroX] = '.';
+                }
             }
-
 
         }
     }
 }
 
-void dibujar_pieza_del_tablero(char **tab, unsigned char pieza[4], int x, int y){ // x es la columna de la nueva posocion en la que se encuentra la figura, y Y la fila
-
+void dibujar_pieza_del_tablero(char **tab, unsigned short pieza, int x, int y) { // x es la columna en la que se encuentra la figura, y Y la fila
 
     /*
 
-    Una vez la posicion anterior de la pieza fue eliminada, se procesa la nueva posicion de la ficha.
-
+    Una vez el usuario haya realizado un moviemiento, para actulizar la posicion de la pieza en el tablero
+    esta se debe borrar de donde estaba antes, esta funcion realiza la eliminacion de la pieza
      */
-    for(int fila = 0; fila < 4; fila++){
 
-        for(int columna = 0; columna < 4; columna++){
+        for(int fila = 0; fila < 4; fila++) {
 
-            if(pieza[fila] & (1 << (3 - columna))){
+            for(int columna = 0; columna < 4; columna++) {
 
-                tab[y + fila][x + columna] = '#';
+                int bit = 15 - (fila * 4 + columna);
+
+                if((pieza >> bit) & 1) {
+
+                    int tableroY = y + fila;
+                    int tableroX = x + columna;
+
+                    if (tableroY >= 0)
+                    {
+                        tab[tableroY][tableroX] = '#';
+                    }
+                }
             }
         }
     }
-}
 
 
 
-void actualizacion_tablero(unsigned char pieza[4], char **tabl, int alto, int ancho, int x, int y){
+    void actualizacion_tablero(char **tabl, unsigned short pieza, int alto, int ancho, int x, int y){
 
-    /*
+        /*
 
     Esta funcion se encarga de imprimir el tablero actualizado con el movimiento realizado por el usuario
      */
 
-    for(int fila = 0; fila < alto; fila++){
+        for(int fila = 0; fila < alto; fila++){
 
-        for(int columna = 0; columna < ancho; columna++){
+            for(int columna = 0; columna < ancho; columna++){
 
-            bool dibujado = false;
+                bool dibujado = false;
 
-            for(int i = 0; i <4; i++){ // recorre toda la ficha y verifica si en la posicion (i,j) hay un # y si la fila y verifica si concuerda con la posicion real de la fichja en el tablero
+                // verificamos si la celda del tablero está dentro del área de la pieza (4x4)
+                if (fila >= y && fila < y + 4 && columna >= x && columna < x + 4){
 
-                for(int j = 0; j <4; j++){
+                    int i = fila - y;
 
-                    if ((pieza[i] & (1 << (3-j))) && fila == y+i && columna == x+j){
+                    int j = columna - x;
 
-                        cout << '#';
-                        dibujado = true;
+                    if (i >= 0 && i < 4 && j >= 0 && j < 4){
+
+                        int bit = 15 - (i * 4 + j);
+
+                        if ((pieza >> bit) & 1){
+
+                            cout << '#';
+
+                            dibujado = true;
+                        }
                     }
+                }
 
 
+                if (dibujado == false){ // si no entra al if, es porque en la posicion (i,j) no hay un #, por tanto se imprime el tablero normal
+
+                    cout << tabl[fila][columna];
                 }
 
             }
-
-            if (dibujado == false){ // si no entra al if, es porque en la posicion (i,j) no hay un #, por tanto se imprime el tablero normal
-
-                cout << tabl[fila][columna];
-            }
-
-
-
+            cout << endl;
         }
-        cout << endl;
+
+         cout << "Accion : [A] Izquierda  [D] Derecha  [S] bajar  [W] rotar [Q] salir: ";
     }
-}
 
 
 void eliminacion_fila(char **tab, int alto, int ancho){
@@ -164,7 +187,7 @@ void eliminacion_fila(char **tab, int alto, int ancho){
 
         bool filallena = true;
 
-        for(int columnas = 0; columnas < ancho; columnas++){
+        for(int columnas = 1; columnas < ancho - 1; columnas++){
 
             if(tab[filas][columnas] == '.'){
 
@@ -179,13 +202,13 @@ void eliminacion_fila(char **tab, int alto, int ancho){
 
             for(int i = filas; i > 0; i--){
 
-                for(int j = 0; j < ancho; j++){
+                for(int j = 1; j < ancho - 1; j++){
 
                     tab[i][j] = tab[i - 1][j];
                 }
             }
 
-            for(int k = 0; k < ancho; k++){
+            for(int k = 1; k < ancho - 1; k++){
 
                 tab[0][k] = '.';
             }
@@ -216,4 +239,23 @@ bool game_over(char **tab, int ancho){
 
 
     return false; // Si no detecta un espacio ocupado en la primera fila, el juego sigue hasta que se verifique otra vez la condicion
+}
+
+
+void Centrar(int ancho, int &x, int &y){
+
+    x = (ancho / 2) - 2;
+
+    y = -2;
+
+}
+
+void liberar_memoria(char **tab, int alto){
+
+    for (int fila = 0; fila < alto; fila++)
+    {
+        delete[] tab[fila];
+    }
+
+    delete[] tab;
 }

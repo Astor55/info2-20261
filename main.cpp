@@ -1,108 +1,232 @@
 #include <iostream>
-<<<<<<< HEAD
-
-int main() {
-    std::cout << "Programa funcionando" << std::endl;
-    return 0;
-=======
+#include <random>
 #include "fichas.h"
+#include "funciones_tablero.h"
+
+
+void verificacion(int &alto, int &ancho);
+
+void Limpiar_Pantalla();
+
+void limpiarBuffer();
 
 using namespace std;
-
-#include <iostream>
-#include "fichas.h"
-
-using namespace std;
-
-void imprimir_tablero(char** tablero, int ancho, int alto,
-                      unsigned short pieza, int px, int py)
-{
-    for(int i = 0; i < alto; i++)
-    {
-        for(int j = 0; j < ancho; j++)
-        {
-            char dibujar = tablero[i][j];
-
-            for(int f = 0; f < 4; f++)
-            {
-                for(int c = 0; c < 4; c++)
-                {
-                    if(celda_activa(pieza,f,c))
-                    {
-                        if(i == py+f && j == px+c)
-                            dibujar = '#';
-                    }
-                }
-            }
-
-            cout << dibujar;
-        }
-        cout << endl;
-    }
-}
 
 
 int main()
 {
-    int ancho = 12;
-    int alto = 12;
+    int alto;
 
-    char** tablero = new char*[alto];
+    int ancho;
 
-    for(int i=0;i<alto;i++)
-    {
-        tablero[i] = new char[ancho];
+    verificacion(alto, ancho);
 
-        for(int j=0;j<ancho;j++)
+    char **tab = tablero(alto, ancho);
+
+    random_device rd;
+
+    mt19937 gen(rd());
+
+    uniform_int_distribution <int> dist(0, 5);
+
+    unsigned short pieza = ElegirPieza(dist(gen));
+
+    int x;
+
+    int y;
+
+    Centrar(ancho, x, y);
+
+    while (true)
         {
-            if(j==0 || j==ancho-1)
-                tablero[i][j] = '|';
+
+        Limpiar_Pantalla();
+
+        actualizacion_tablero(tab, pieza, alto, ancho, x, y);
+
+        if (game_over(tab, ancho))
+        {
+
+            cout << "\n GAME OVER \n";
+
+            liberar_memoria(tab, alto);
+
+            break;
+
+        }
+
+        char jugada;
+
+        cin >> jugada;
+
+        if (jugada != 'W' && jugada != 'w' &&
+            jugada != 'A' && jugada != 'a' &&
+            jugada != 'S' && jugada != 's' &&
+            jugada != 'D' && jugada != 'd' &&
+            jugada != 'Q' && jugada != 'q')
+        {
+
+            cout << "Comando invalido\n";
+
+            while (cin.get() != '\n'); // limpiar basura
+
+            continue;
+
+        }
+
+        if (jugada == 'W' || jugada == 'w'){
+
+            unsigned short copia = RotarPieza(pieza);
+
+            if (!Colision(tab, copia, x, y, alto, ancho))
+            {
+
+                pieza = copia;
+
+            }
+
+        }
+
+        else if(jugada == 'S' || jugada == 's')
+        {
+
+            if(!Colision(tab, pieza, x, y + 1, alto, ancho))
+            {
+
+                y++;
+
+            }
+
             else
-                tablero[i][j] = '.';
+            {
+
+                Fijar_pieza(tab, pieza, x, y);
+
+                eliminacion_fila(tab, alto, ancho);
+
+                pieza = ElegirPieza(dist(gen));
+
+                Centrar(ancho, x, y);
+
+                if(Colision(tab, pieza, x, y, alto, ancho))
+                {
+
+                    Limpiar_Pantalla();
+
+                    actualizacion_tablero(tab, pieza, alto, ancho, x, y);
+
+                    cout << "\n GAME OVER \n";
+
+                    liberar_memoria(tab, alto);
+
+                    break;
+
+                }
+
+            }
+
         }
+
+        else if(jugada == 'D' || jugada == 'd')
+        {
+
+            if(!Colision(tab, pieza, x + 1, y, alto, ancho))
+            {
+
+                x++;
+
+            }
+
+        }
+
+        else if(jugada == 'A' || jugada == 'a')
+        {
+
+            if(!Colision(tab, pieza, x - 1, y, alto, ancho))
+            {
+
+                x--;
+
+            }
+
+        }
+
+        else if(jugada == 'Q' || jugada == 'q')
+        {
+
+            cout << "Gracias Por Jugar! ;)";
+
+            liberar_memoria(tab, alto);
+
+            break;
+
+        }
+
     }
 
-    unsigned short pieza = CrearPiezaT();
+    return 0;
 
-    int x = 4;
-    int y = 0;
+}
 
-    char opcion;
 
-    while(true)
+void verificacion(int &alto, int &ancho)
+
+{
+
+    do
     {
-        cout << "\n";
-        imprimir_tablero(tablero,ancho,alto,pieza,x,y);
 
-        cout << "\nA izquierda\n";
-        cout << "D derecha\n";
-        cout << "S bajar\n";
-        cout << "W rotar\n";
-        cout << "Q salir\n";
+        cout << "Ingrese el alto: ";
 
-        cin >> opcion;
+        cin >> alto;
 
-        int nuevoX = x;
-        int nuevoY = y;
-        unsigned short nuevaPieza = pieza;
-
-        if(opcion=='a') nuevoX--;
-        if(opcion=='d') nuevoX++;
-        if(opcion=='s') nuevoY++;
-        if(opcion=='w') nuevaPieza = RotarPieza(pieza);
-
-        if(opcion=='q') break;
-
-        if(!Colision(tablero,nuevaPieza,nuevoX,nuevoY))
+        if(cin.fail())
         {
-            x = nuevoX;
-            y = nuevoY;
-            pieza = nuevaPieza;
+
+            limpiarBuffer();
+
+            cout << "Entrada invalida.\n";
+
+            continue;
+
         }
-        else
+
+        cout << "Ingrese el ancho (un numero multiplo de 8): ";
+
+        cin >> ancho;
+
+        if (cin.fail())
         {
-            cout << "COLISION\n";
+
+            limpiarBuffer();
+
+            cout << "Entrada invalida.\n";
+
+            continue;
+
         }
+
     }
->>>>>>> origin/master
+
+    while (ancho % 8 != 0 || alto < 8 || alto > 15 || ancho < 8 || ancho > 24);
+
+}
+
+void Limpiar_Pantalla()
+{
+
+    for (int i= 0; i < 40; i++)
+    {
+
+        cout << endl;
+
+    }
+
+}
+
+void limpiarBuffer()
+{
+    cin.clear(); // limpia error
+
+    while (cin.get() != '\n'); // vacía el buffer
 }

@@ -94,6 +94,18 @@ unsigned short CrearPiezaO() // se crea la pieza O del tetris 2x2
 
 }
 
+unsigned short  CrearPiezaRecta() // se crea la pieza recta del tetris 1x4
+{
+    unsigned short pieza = 0;
+
+    pieza |= (1 << 15);
+    pieza |= (1 << 11);
+    pieza |= (1 << 7);
+    pieza |= (1 << 3);
+
+    return pieza;
+
+}
 
 /*
 ElegirPieza selecciona una pieza según un numero recibido.
@@ -114,6 +126,8 @@ unsigned short ElegirPieza(int cual)
     case 3: return CrearPiezaZ();
 
     case 4: return CrearPiezaO();
+
+    case 5: return CrearPiezaRecta();
 
     default: return CrearPiezaT();
 
@@ -177,7 +191,7 @@ unsigned short RotarPieza(unsigned short pieza)
         for (int columna = 0; columna < 4; columna++)
         {
 
-            int bit = (fila * 4) + columna;
+            int bit = 15 - (fila * 4 + columna);
 
             if (pieza &(1 << bit))
             {
@@ -186,7 +200,7 @@ unsigned short RotarPieza(unsigned short pieza)
 
                 int NuevaColumna = 3 - fila;
 
-                int nuevoBit = (NuevaFila * 4) + NuevaColumna;
+                int nuevoBit = 15 - (NuevaFila * 4 + NuevaColumna);
 
                 NuevaPos |= (1 << nuevoBit);
 
@@ -209,7 +223,7 @@ está activa para cuando se confirmen las colisiones.
 bool celda_activa(unsigned short pieza, int x, int y)
 {
 
-    int bit = (x * 4) + y;
+    int bit = 15 - (x * 4 + y);
 
     unsigned short mascara = 1 << bit;
 
@@ -254,6 +268,11 @@ bool Colision(char** tablero, unsigned short pieza, int x, int y, int alto, int 
 
                 int tableroX = x + columna;
 
+                if (tableroY < 0)
+                {
+                    continue;
+                }
+
                 if(tableroY < 0 || tableroY >= alto
                     || tableroX <= 0 || tableroX >= ancho - 1) // limites del tablero
                 {
@@ -261,12 +280,19 @@ bool Colision(char** tablero, unsigned short pieza, int x, int y, int alto, int 
                     return true;
 
                 }
-                if(tablero[tableroY][tableroX] != '.') // colisiona con lo que no sea vacio '.'
-                {
+                if (tableroY >= 0){
 
-                    return true;
+                    if(tablero[tableroY][tableroX] != '.') // colisiona con lo que no sea vacio '.'
+                    {
+
+                        return true;
+
+                    }
+
 
                 }
+
+
             }
 
         }
@@ -294,7 +320,16 @@ void Fijar_pieza(char** tablero, unsigned short pieza, int x, int y)
             if(celda_activa(pieza, fila, columna))
             {
 
-                tablero[y + fila][x + columna] = '#';
+                int tableroY = y + fila;
+
+                int tableroX = x + columna;
+
+                if (tableroY >= 0){
+
+                    tablero[tableroY][tableroX] = '#';
+
+                }
+
 
             }
 
